@@ -1,0 +1,5 @@
+- pacchetto jar emebedded o download?
+- pare che l'installatore non funzioni se nell'install_path ci sono spazi (questo preclude la possibilità di metterlo sotto "Program Files" che sarebbe la best practise)
+- gestire il PATH (poi serve rimuovere in uninstall) o mettere sempre in system32?
+- gestire dependency JRE (autoinstall?) vedi JDK su choco o decidere altro (che JRE prendiamo come default?)
+- update to latest?
