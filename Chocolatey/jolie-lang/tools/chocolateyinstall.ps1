@@ -3,7 +3,8 @@
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
 
 $ErrorActionPreference = 'Stop'; # stop on all errors
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+Get-ChocolateyWebFile -PackageName "jolie-$version" -FileFullPath "$toolsDir\jolie-$version.jar" -Url "https://github.com/jolie/jolie/releases/download/v$version/jolie-$version.jar"
 $installationPath = "C:\Jolie" 
 $params = "$env:chocolateyPackageParameters" 
 $params = (ConvertFrom-StringData $params.Replace(";", "`n")) 
@@ -17,6 +18,6 @@ if( Test-Path $installationPath -PathType Container ) {
   Remove-Item -Recurse -Force $installationPath
 }
 Write-Output "Installing Jolie v$version in $installationPath ..."
-java -jar "$toolsDir\jolie-1.9.1.jar" /jh "$installationPath" /jl "$installationPath\jolie\bin" 
+java -jar "$toolsDir\jolie-$version.jar" /jh "$installationPath" /jl "$installationPath\jolie\bin" 
 Install-ChocolateyEnvironmentVariable "JOLIE_HOME" "$installationPath" Machine
 Install-ChocolateyPath $installationPath\jolie\bin -PathType 'Machine'
