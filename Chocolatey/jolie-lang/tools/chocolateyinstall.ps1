@@ -5,19 +5,23 @@
 $ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 Get-ChocolateyWebFile -PackageName "jolie-$version" -FileFullPath "$toolsDir\jolie-$version.jar" -Url "https://github.com/jolie/jolie/releases/download/v$version/jolie-$version.jar"
-$installationPath = "C:\Jolie" 
-$params = "$env:chocolateyPackageParameters" 
-$params = (ConvertFrom-StringData $params.Replace(";", "`n")) 
-if ($params.installdir -ne $null) {
-  $installationPath = $params.installdir
-}
 
+$installationPath = "$toolsDir\dist\jolie" 
 Write-Output "Checking environment..."
 if( Test-Path $installationPath -PathType Container ) {
   Write-Output "Removing old files..."
   Remove-Item -Recurse -Force $installationPath
 }
-Write-Output "Installing Jolie v$version in $installationPath ..."
-java -jar "$toolsDir\jolie-$version.jar" /jh "$installationPath" /jl "$installationPath\jolie\bin" 
+
+Set-Location -Path $toolsDir
+Write-Output "Extracting Jolie files from jar..."
+jar xf "$toolsDir\jolie-$version.jar" dist.zip
+Write-Output "Copying Jolie files to destination..."
+Get-ChocolateyUnzip -FileFullPath "$toolsDir\dist.zip" -Destination $toolsDir
+New-Item -Path "$toolsDir\dist\jolie" -Name "jolie\bin" -ItemType "directory"
+Copy-Item -Path "$toolsDir\dist\launchers\*" -Destination "$toolsDir\dist\jolie\jolie\bin"
+Remove-Item "$toolsDir\dist\launchers\*" -Recurse
+Remove-Item "$toolsDir\dist\launchers"
+Write-Output "Setting environment..."
 Install-ChocolateyEnvironmentVariable "JOLIE_HOME" "$installationPath" Machine
 Install-ChocolateyPath $installationPath\jolie\bin -PathType 'Machine'
